@@ -1,5 +1,4 @@
 use std::marker::PhantomData;
-use std::ptr;
 use std::ptr::NonNull;
 
 pub struct Node<T> {
@@ -20,7 +19,7 @@ impl<T> Node<T> {
 
 pub struct LinkedList<T> {
     pub length: u32,
-    pub head: Option<NonNull<Node<T>>>,
+    pub head: Option<NonNull<Node<T>>>, // equivalente a *mut T
     pub tail: Option<NonNull<Node<T>>>,
     marker: PhantomData<Box<Node<T>>>,
 }
@@ -67,5 +66,41 @@ impl<T> LinkedList<T> {
         }
         self.tail = node_ptr;
         self.length += 1;
+    }
+
+    pub fn insert_at_ith(&mut self, index: u32, obj: T) {
+        if self.length < index {
+            panic!("Index out of bounds");
+        }
+
+        if index == 0 || self.head.is_none() {
+            self.insert_at_head(obj);
+            return;
+        }
+
+        // head pode ser None então, se não for, inicializamos uma variável
+        // ith node para passear pelos nós
+        if let Some(mut ith_node) = self.head {
+            for _ in 0..index {
+                unsafe {
+                    match (*ith_node.as_ptr()).next {
+                        None => panic!("Index out of bounds"),
+                        Some(next_ptr) => ith_node = next_ptr,
+                    }
+                }
+            }
+
+            let mut node = Box::new(Node::new(obj));
+            unsafe {
+                node.prev = (*ith_node.as_ptr()).prev;
+                node.next = Some(ith_node); // exigência do Optional
+                let node_ptr = NonNull::new(Box::into_raw(node));
+                if let Some(p) = (*ith_node.as_ptr()).prev {
+                    (*p.as_ptr()).next = node_ptr;
+                    (*ith_node.as_ptr()).prev = node_ptr;
+                    self.length += 1;
+                }
+            }
+        }
     }
 }
