@@ -104,5 +104,20 @@ impl<T> LinkedList<T> {
         }
     }
 
-    pub fn delete_head() -> Option<T> {}
+    pub fn delete_head(&mut self) -> Option<T> {
+        if self.length == 0 {
+            return None;
+        }
+
+        self.head.map(|head_ptr| unsafe {
+            let old_head = Box::from_raw(head_ptr.as_ptr());
+            match old_head.next {
+                Some(mut next_ptr) => next_ptr.as_mut().next = None,
+                None => self.tail = None,
+            }
+            self.head = old_head.next;
+            self.length = self.length.checked_add_signed(-1).unwrap_or(0);
+            old_head.val
+        })
+    }
 }
