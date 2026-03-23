@@ -1,3 +1,4 @@
+use std::fmt::{self, Display, Formatter};
 use std::marker::PhantomData;
 use std::ptr::NonNull;
 
@@ -178,13 +179,43 @@ impl<T> LinkedList<T> {
         Self::get_ith_node(self.head, index).map(|node| unsafe { &(*node.as_ptr()).val })
     }
 
-    pub fn get_ith_node(node: Option<NonNull<Node<T>>>, index: i32) -> Option<NonNull<Node<T>>> {
+    fn get_ith_node(node: Option<NonNull<Node<T>>>, index: i32) -> Option<NonNull<Node<T>>> {
         match node {
             None => None,
             Some(next_ptr) => match index {
                 0 => Some(next_ptr),
                 _ => Self::get_ith_node(unsafe { (*next_ptr.as_ptr()).next }, index - 1),
             },
+        }
+    }
+}
+
+impl<T> Drop for LinkedList<T> {
+    fn drop(&mut self) {
+        while self.delete_head().is_some() {}
+    }
+}
+
+impl<T> Display for LinkedList<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self.head {
+            Some(node) => write!(f, "{}", unsafe { node.as_ref() }),
+            None => Ok(()),
+        }
+    }
+}
+
+impl<T> Display for Node<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self.next {
+            Some(node) => write!(f, "{}, {}", self.val, unsafe { node.as_ref() }),
+            None => write!(f, "{}", self.val),
         }
     }
 }
