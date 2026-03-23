@@ -173,4 +173,18 @@ impl<T> LinkedList<T> {
             None
         }
     }
+
+    pub fn get(&self, index: i32) -> Option<&T> {
+        Self::get_ith_node(self.head, index).map(|node| unsafe { &(*node.as_ptr()).val })
+    }
+
+    pub fn get_ith_node(node: Option<NonNull<Node<T>>>, index: i32) -> Option<NonNull<Node<T>>> {
+        match node {
+            None => None,
+            Some(next_ptr) => match index {
+                0 => Some(next_ptr),
+                _ => Self::get_ith_node(unsafe { (*next_ptr.as_ptr()).next }, index - 1),
+            },
+        }
+    }
 }
