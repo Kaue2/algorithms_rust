@@ -120,4 +120,57 @@ impl<T> LinkedList<T> {
             old_head.val
         })
     }
+
+    pub fn delete_tail(&mut self) -> Option<T> {
+        self.tail.map(|tail_ptr| unsafe {
+            let old_tail = Box::from_raw(tail_ptr.as_ptr());
+            match old_tail.prev {
+                Some(mut prev_ptr) => prev_ptr.as_mut().next = None,
+                None => self.head = None,
+            }
+            self.tail = old_tail.next;
+            self.length = self.length.checked_add_signed(-1).unwrap_or(0);
+            old_tail.val
+        })
+    }
+
+    pub fn delete_ith(&mut self, index: u32) -> Option<T> {
+        if self.length <= index {
+            panic!("Index out of bounds");
+        }
+
+        if index == 0 || self.head.is_none() {
+            return self.delete_head();
+        }
+
+        if index == self.length - 1 {
+            return self.delete_tail();
+        }
+
+        if let Some(mut ith_node) = self.head {
+            for _ in 0..index {
+                unsafe {
+                    match (*ith_node.as_ptr()).next {
+                        None => panic!("Index out of bounds"),
+                        Some(next) => ith_node = next,
+                    }
+                }
+            }
+
+            unsafe {
+                let old_ith = Box::from_raw(ith_node.as_ptr());
+                if let Some(mut prev) = old_ith.prev {
+                    prev.as_mut().next = old_ith.next;
+                }
+                if let Some(mut next) = old_ith.next {
+                    next.as_mut().prev = old_ith.prev;
+                }
+
+                self.length -= 1;
+                Some(old_ith.val)
+            }
+        } else {
+            None
+        }
+    }
 }
