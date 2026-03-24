@@ -24,8 +24,8 @@ mod tests {
     #[test]
     fn descending() {
         let mut vec1 = vec![6, 5, 4, 3, 2, 1];
-        let clonned = vec1.clone();
+        let cloned = vec1.clone();
         bubble_sort(&mut vec1);
-        assert!(is_sorted(&vec1) && have_same_elements(&vec1, &clonned));
+        assert!(is_sorted(&vec1) && have_same_elements(&vec1, &cloned));
     }
 }

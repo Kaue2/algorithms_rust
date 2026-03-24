@@ -46,3 +46,19 @@ pub fn quick_sort<T: Ord>(arr: &mut [T]) {
         _quick_sort(arr, 0, len - 1);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::sorting::have_same_elements;
+    use crate::sorting::is_sorted;
+
+    #[test]
+    fn basic() {
+        let mut arr = vec![-3, 2, 72, 3, -8, 9, 10];
+        let cloned = arr.clone();
+        quick_sort(&mut arr);
+
+        assert!(is_sorted(&arr) && have_same_elements(&arr, &cloned));
+    }
+}

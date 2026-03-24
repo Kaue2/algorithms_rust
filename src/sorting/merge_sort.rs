@@ -36,9 +36,9 @@ mod tests {
     #[test]
     fn basic() {
         let mut arr = vec![10, 3, 7, 12, -1, 3, -4];
-        let clonned = arr.clone();
+        let cloned = arr.clone();
 
         top_down_merge_sort(&mut arr);
-        assert!(is_sorted(&arr) && have_same_elements(&arr, &clonned));
+        assert!(is_sorted(&arr) && have_same_elements(&arr, &cloned));
     }
 }
