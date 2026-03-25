@@ -1,10 +1,12 @@
 mod bubble_sort;
 mod merge_sort;
 mod quick_sort;
+mod radix_sort;
 
 pub use self::bubble_sort::bubble_sort;
 pub use self::merge_sort::top_down_merge_sort;
 pub use self::quick_sort::quick_sort;
+pub use self::radix_sort::radix_sort;
 
 use std::cmp;
 use std::collections::HashSet;
